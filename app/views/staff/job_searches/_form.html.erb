@@ -1,0 +1,32 @@
+<div class="search-block js-search-form">
+  <%= form_for [:staff, job_search], url: :staff_job_search_seo, method: :get, html: { class: 'search-block__form row' } do |f| %>
+    <div class="small-12 medium-5 columns">
+      <label class="input input--with-icon selectize">
+        <small class="input__reset" aria-hidden="true" style="<%= 'display:none' if job_search.que.empty? %>">×</small>
+        <%= f.text_field :que, 'data-labelled': true, 'data-selectize-auto-select': true,
+          autocomplete: 'off', 'data-trigger-length': 3, 'data-search-path': autocomplete_staff_occupations_path %>
+        <small class="input__label"><%=t 'activemodel.job_search.que' %></small>
+        <span class="border"></span>
+        <svg class="s-icon s-icon--fill--white"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#magnifier"></use></svg>
+      </label>
+    </div>
+    <div class="small-12 medium-4 columns">
+      <label class="input input--with-icon selectize">
+        <small class="input__reset" aria-hidden="true" data-click="resetInput" style="<%= 'display:none' if job_search.donde.empty? %>">×</small>
+        <%= f.text_field :donde, 'data-labelled': true, 'data-selectize-auto-select': true,
+          autocomplete: 'off', 'data-trigger-length': 2, 'data-search-path': autocomplete_staff_locations_path %>
+        <small class="input__label"><%=t 'activemodel.job_search.donde' %></small>
+        <span class="border"></span>
+        <svg class="s-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#map"></use></svg>
+      </label>
+    </div>
+    <%= f.hidden_field :per_page %>
+    <%= f.hidden_field :page %>
+    <div class="search__form__button small-12 medium-3 columns show-for-medium">
+      <%= f.button 'Rechercher', class: 'button button--big button--uppercase button--no-margin button--wide' %>
+    </div>
+    <div class="search__form__button small-12 medium-3 columns hide-for-medium">
+      <%= f.button 'Rechercher', class: 'button button--big button--uppercase button--no-margin button--wide' %>
+    </div>
+  <% end %>
+</div>

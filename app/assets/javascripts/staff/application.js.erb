@@ -1,0 +1,115 @@
+(function staff($) {
+/**
+ * Use selectize for the auto select home search
+ */
+function autoSelect() {
+  $('[data-selectize-auto-select]').each(function initSelectize() {
+
+    var $this = $(this),
+        $closestInput = $this.closest('.input'),
+        $resetInput = $this.prev($('.input__reset')),
+        selectized;
+    var triggerLength = $this.data('trigger-length');
+    var searchPath = $this.data('search-path');
+
+    if ($this.attr('id') === 'job_search_que'){
+      var sortParams = 'name_and_synonyms';
+    } else if ($this.attr('id') === 'job_search_donde'){
+      var sortParams = [
+        {field: 'department_code', direction: 'desc'},
+        {field: 'name_and_synonyms'},
+        {field: '$score'}
+      ];
+    }
+
+    $this.on('input', function(e) {
+      var value = e && e.target && e.target.value;
+
+      if(value && value.length) { $resetInput.fadeIn(); }
+
+      if(value && value.length >= triggerLength) {
+        selectized = $this.selectize({
+          plugins: ['restore_on_backspace'],
+          maxItems: 1,
+          loadThrottle: null,
+          valueField: 'search_value',
+          labelField: 'search_value',
+          openOnFocus: false,
+          searchField: ['department_code', 'name_and_synonyms'],
+          sortField: sortParams,
+          searchConjunction: 'and',
+          delimiter: false,
+          options: [{search_value: '', name_and_synonyms: '', department_code: ''}],
+          create: true,
+          createOnBlur: true,
+          addPrecedence: true,
+          onFocus: function() {
+            $closestInput.addClass('focus');
+          },
+          onBlur: function() {
+            $closestInput.removeClass('focus');
+          },
+          onDropdownOpen: function($dropdown){
+            if (this.items.length > 0) {
+              $dropdown.hide();
+            }
+          },
+          onItemRemove: function(){
+            var options = selectized[0].selectize.options;
+            this.$dropdown.show();
+          },
+          onChange: function(value) {
+            if(value) {
+              $this.addClass('filled');
+              if($resetInput) { $resetInput.fadeIn(); }
+              selectized[0].selectize.focus();
+            } else { $this.removeClass('filled'); }
+          },
+          onType: function(value){
+            if (selectized && value.length < triggerLength) {
+              selectized[0].selectize.close();
+              selectized[0].selectize.clearOptions();
+            } else {
+              selectized[0].selectize.clearCache();
+            }
+          },
+          render: {
+            option_create: function(input){
+              return '<div class="create" data-selectable>' + input.input + '</div>';
+            }
+          },
+          load: function(query, callback){
+            if (query.length < triggerLength) return callback();
+            $.ajax({
+              url: searchPath,
+              type: 'GET',
+              data: {
+                term: query,
+              },
+              error: function() {
+                callback();
+              },
+              success: function(result) {
+                callback(JSON.parse(result));
+              }
+            });
+          }
+        });
+        selectized[0].selectize.focus();
+        $this.next('.selectize-control').find('input').val(value);
+      }
+
+      $resetInput.on('click', function() {
+        $this.val('');
+        if(selectized) {
+          selectized[0].selectize.clear();
+          selectized[0].selectize.focus();
+          selectized[0].selectize.clearOptions();
+        }
+        if($resetInput) { $resetInput.fadeOut(); }
+      });
+
+    });
+  })
+}
+})(jQuery);
