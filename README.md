@@ -6,4 +6,4 @@
 and find out by matching pattern. It requires to joins and search few tables. In client, Selectize
 library needs to be customized very hard to adapt with the requirements.
 
-
+2. Require to format the jobs which gets from the database, then filter by descendatns.

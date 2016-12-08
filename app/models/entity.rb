@@ -18,4 +18,14 @@ class Entity < ActiveRecord::Base
       }
     end
   end
+
+  def online_job_offers_on site
+    Rails.cache.fetch("entity-#{self.id}-online_job_offers_on-#{site.id}") do
+      if site.staffsante?
+        Job.online.job_offers.joins(:domains).where(domains: { name: Domain::STAFFSANTE_AGGREGATE }).published_by(self).uniq.includes(:locations)
+      else
+        Job.online.job_offers.joins(:domains).where(domains: { id: site.id }).published_by(self).includes(:locations)
+      end
+    end
+  end
 end

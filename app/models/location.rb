@@ -28,4 +28,9 @@ class Location < ActiveRecord::Base
       }
     }
   end
+
+  def only_department_descendants
+    return unless self.region?
+    Location.unscoped.where('? < lft AND lft < ?', self.left, self.right).where(category: 'department')
+  end
 end

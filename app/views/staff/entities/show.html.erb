@@ -1,0 +1,51 @@
+<% meta "page_entity", meta_title_for_entity(@entity), meta_description_for_entity(@entity) %>
+<div class="etablissement">
+  <%= render 'staff/job_searches/form', job_search: JobSearch.new %>
+  <div class="etablissement__alert">
+    <div class="etablissement__alert__inner">
+      <div class="row">
+        <div class="small-2 columns text--center">
+          <%= image_tag @entity.logo.url(:large), alt: @entity.name, title: @entity.name if @entity.logo %>
+        </div>
+        <div class="small-10 columns">
+          <h1><%= @entity.name %></h1>
+          <%= link_to @entity.group.name, staff_entity_seo_path(@entity.group) if @entity.group %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="columns small-12 medium-9">
+      <div class="etablissement__block">
+        <div class="etablissement__block__header">
+          <div class="p">
+            <%= sanitized_simple_format(@entity.description) %>
+          </div>
+        </div>
+      </div>
+      <% if @all_jobs.any? %>
+        <div class="etablissement__block">
+          <h3><%= t '.latest_jobs_title' %></h3>
+          <table class="table">
+            <% @latest_jobs.each do |job| %>
+              <%= render 'staff/shared/job', job: job %>
+            <% end %>
+          </table>
+          <%= link_to staff_job_search_seo_path(quoi: @entity.name, types_contrat: :job_offer),
+            {class: "button button--uppercase--no-spacing primary button--top-bottom-margin"} do %>
+            <span><%= t('.total_offer', total: @all_jobs.length) %> </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <div class="columns small-12 medium-3 etablissement__sidebar sidebar">
+      <div class="etablissement__sidebar__block sidebar__block">
+        <h4><%= t('staff.jobs.show.recruiter_info_block.contact_infomation') %></h4>
+        <%= application_address_block(@entity.application_process, true) %>
+        <%= link_to(t('staff.jobs.show.recruiter_info_block.recruiter_site'), @entity.website, rel: 'noindex', title: @entity.name, target: '_blank') if @entity.website.present? %>
+      </div>
+    </div>
+  </div>
+
+</div>
